@@ -1,0 +1,19 @@
+{
+  "name": "african_proverb_api",
+  "version": "1.0.0",
+  "description": "African proverb generation RESTful api",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elvis-ndubuisi/african_proverb_api.git"
+  },
+  "author": "Elvis Ndubuisi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elvis-ndubuisi/african_proverb_api/issues"
+  },
+  "homepage": "https://github.com/elvis-ndubuisi/african_proverb_api#readme"
+}
