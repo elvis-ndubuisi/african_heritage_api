@@ -4,7 +4,7 @@ const proverbSchema = new Schema(
   {
     proverb: {
       type: String,
-      require: [true, "Please provide a proverb"],
+      required: [true, "Please provide a proverb"],
     },
     lang: {
       type: String,
