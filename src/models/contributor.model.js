@@ -4,25 +4,26 @@ const contributorSchema = new Schema(
   {
     name: {
       type: String,
-      require: [true, "Please provide a name for identify"],
+      required: [true, "Please provide a name for identify"],
     },
     email: {
       type: String,
-      require: [true, "Please provide an email"],
+      required: [true, "Please provide an email"],
     },
     password: {
       type: String,
-      require: [true, "Please provide a password"],
+      required: [true, "Please provide a password"],
     },
     country: {
-      require: [true, "Please provide a country"],
+      required: [true, "Please provide a country"],
       type: String,
     },
     social_link: {
-      require: false,
+      required: false,
       type: String,
       default: "",
     },
+    profile: { type: String, default: "", required: false },
   },
   { timestamps: true }
 );
