@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-// const localuri = "mongodb://localhost:27017/africanProverbDatabase";
-
 const connectMongo = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
