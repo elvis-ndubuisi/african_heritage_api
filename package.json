@@ -4,7 +4,9 @@
   "description": "African proverb generation RESTful api",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "serve": "nodemon src/server.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,15 @@
   "bugs": {
     "url": "https://github.com/elvis-ndubuisi/african_proverb_api/issues"
   },
-  "homepage": "https://github.com/elvis-ndubuisi/african_proverb_api#readme"
+  "homepage": "https://github.com/elvis-ndubuisi/african_proverb_api#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "helmet": "^5.0.2",
+    "mongoose": "^6.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
 }
