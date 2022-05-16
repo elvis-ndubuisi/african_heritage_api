@@ -2,19 +2,18 @@ const { model, Schema } = require("mongoose");
 
 const proverbSchema = new Schema(
   {
-    proverb: {
+    quote: {
       type: String,
       required: [true, "Please provide a proverb"],
     },
-    lang: { type: String, default: "english" },
-    proverb_id: { type: Number },
-    // added_by: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "contributor",
-    // },
+    quote_native: { type: String },
+    lang: { type: String, default: "" },
+    added_by: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "contributor",
+    },
     unique_to: { type: Array, default: [] },
-    translations: { type: Array, default: [] },
   },
   { timestamps: true }
 );

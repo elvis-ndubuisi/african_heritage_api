@@ -1,34 +1,27 @@
 const colors = require("colors");
+const Proverb = require("../models/proverb.model");
 const Proverbs = require("../models/proverb.model");
 
 // @desc    Adds new proverb.
-// @route   POST proverb/{user}/contribute
+// @route   POST proverb/contribute
 // @access  protected.
 const addProverb = async (req, res) => {
-  const { proverb, unique_to, translations } = req.body;
+  const { quote, quote_native } = req.body;
 
-  if (!proverb) {
+  if (!quote) {
     return res.status(404).json({ message: "Please provide a proverb" });
   }
 
-  const unique_to_Arr = [];
-  if (unique_to) {
-    await unique_to.forEach((item) => {
-      unique_to_Arr.push(item);
-    });
-  }
-  const translationsObj = [];
-  if (translations) {
-    await translations.forEach((object) => {
-      translationsObj.push(object);
-    });
+  // Check if authorized.
+  if (!req.user) {
+    return res.status(401).json({ message: "Access denied" });
   }
 
   try {
     const quote = await Proverbs.create({
-      proverb,
-      unique_to: unique_to_Arr,
-      translations: translationsObj,
+      quote,
+      added_by: req.user.id,
+      quote_native,
     });
 
     if (quote) {
@@ -43,27 +36,12 @@ const addProverb = async (req, res) => {
 };
 
 // @desc    Edit proverb.
-// @route   PATCH proverb/{user}/:id/edit
+// @route   PATCH proverb/:contributorId/edit
 // @access  protected.
 const editProverb = async (req, res) => {
-  const { proverbId, proverb, unique_to, translations } = req.body;
+  const { quote, quote_native, unique_to } = req.body;
 
-  if (!proverb) {
-    return res.status(404).json({ message: "Please provide a proverb" });
-  }
-
-  const unique_to_Arr = [];
-  if (unique_to) {
-    await unique_to.forEach((item) => {
-      unique_to_Arr.push(item);
-    });
-  }
-  const translationsObj = [];
-  if (translations) {
-    await translations.forEach((object) => {
-      translationsObj.push(object);
-    });
-  }
+  if (!req.user) return res.status(401).json({ message: "Access denied" });
 
   try {
     const foundProverb = await Proverbs.findOne({ proverId: proverbId });
@@ -90,14 +68,45 @@ const editProverb = async (req, res) => {
 };
 
 // @desc    Delete proverb.
-// @route   DELETE proverb/{user}/:id/delete
+// @route   DELETE proverb/:contributorId/delete
 // @access  protected.
 const deleteProverb = async (req, res) => {
   res.send("delete proverb");
 };
 
+// @desc    Get a contributors proverbs.
+// @route   GET proverb/:contributorId/delete
+// @access  protected.
+const getProverbs = async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Access denied" });
+
+  try {
+    const contributorProverbs = await Proverb.find({
+      added_by: req.user._id,
+    });
+
+    const data = await contributorProverbs.map((prob) => {
+      return {
+        id: prob._id,
+        quote: prob.quote,
+        native: prob.quote_native,
+        lang: prob.lang,
+        unique_to: prob.unique_to,
+        last_updated: prob.updatedAt,
+      };
+    });
+    res.status(200).json({
+      message: "success",
+      proverb: data,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send(err);
+  }
+};
+
 // @desc    Fetch contributor proverbs.
-// @route   GET proverb/{user}/:id/proverbs
+// @route   GET proverb/:contributorId
 // @access  protected.
 const getContributorProverbs = async (req, res) => {
   res.send("contributors proverbs");
@@ -122,6 +131,7 @@ module.exports = {
   addProverb,
   editProverb,
   deleteProverb,
+  getProverbs,
   getContributorProverbs,
   getAllProverbs,
 };
