@@ -12,8 +12,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes.
-app.use("/account", require("./routes/contributor.routes"));
-app.use("/api/v1/", require("./routes/proverb.routes"));
+app.use("/", require("./routes/contributor.routes"));
+app.use("/api/v1", require("./routes/proverb.routes"));
+app.use("/", require("./routes/test.routes"));
 
 app.listen(PORT, async () => {
   await connectMongo();

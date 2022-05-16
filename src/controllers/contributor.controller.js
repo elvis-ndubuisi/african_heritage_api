@@ -1,12 +1,14 @@
 const bcrypt = require("bcryptjs");
 const colors = require("colors");
 const Contributor = require("../models/contributor.model");
+const jwt = require("jsonwebtoken");
 
 // @desc    Register contributor locally.
 // @route   POST account/join
 // @access  public
 const registerContributor = async (req, res) => {
   const { name, email, password, country } = req.body;
+  console.log(req.body);
 
   // Check for empty field.
   if (!name || !email || !password || !country) {
@@ -24,10 +26,11 @@ const registerContributor = async (req, res) => {
       });
     }
 
-    //   Create new contributor.
+    // Hash password.
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
+    //   Create new contributor.
     const contributor = await Contributor.create({
       name,
       email,
@@ -37,7 +40,14 @@ const registerContributor = async (req, res) => {
 
     //   Check if operation was successful.
     if (contributor) {
-      return res.status(201).json({ message: "Contributor created" });
+      return res.status(201).json({
+        message: "Contributor created",
+        user: {
+          _id: contributor._id,
+          email: contributor.email,
+          name: contributor.name,
+        },
+      });
     } else {
       res.status(400).json({ message: "Invalid user data" });
     }
