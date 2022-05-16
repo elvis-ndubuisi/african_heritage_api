@@ -1,14 +1,13 @@
 const bcrypt = require("bcryptjs");
 const colors = require("colors");
 const Contributor = require("../models/contributor.model");
-const jwt = require("jsonwebtoken");
+const jsonToken = require("../helpers/jsonToken.helper");
 
 // @desc    Register contributor locally.
 // @route   POST account/join
 // @access  public
 const registerContributor = async (req, res) => {
   const { name, email, password, country } = req.body;
-  console.log(req.body);
 
   // Check for empty field.
   if (!name || !email || !password || !country) {
@@ -46,6 +45,10 @@ const registerContributor = async (req, res) => {
           _id: contributor._id,
           email: contributor.email,
           name: contributor.name,
+          token: jsonToken.sign({
+            id: contributor._id,
+            email: contributor.email,
+          }),
         },
       });
     } else {
@@ -84,9 +87,14 @@ const loginContributor = async (req, res) => {
       foundContributor.password
     );
     if (passwordMatch) {
-      // create JWT.
       res.status(200).json({
         success: true,
+        user: {
+          token: jsonToken.sign({
+            id: foundContributor._id,
+            email: foundContributor.email,
+          }),
+        },
       });
     } else {
       res.status(401).json({ message: "Incorrect Password" });
@@ -98,50 +106,81 @@ const loginContributor = async (req, res) => {
 };
 
 // @desc    Get contributor profile.
-// @route   GET account/{name}
+// @route   GET account/:contrubutorId
 // @access  protected.
 const getContributorProfile = async (req, res) => {
-  res.send("get profile");
+  // Check if authentication is present.
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
+
+  // Find profile
+  try {
+    const foundProfile = await Contributor.findById(req.user._id);
+    if (foundProfile) {
+      return res.status(200).json({
+        message: "Profile found",
+        user: {
+          id: foundProfile._id,
+          name: foundProfile.name,
+          email: foundProfile.email,
+          social: foundProfile.social_link,
+          profile: foundProfile.profile_img,
+        },
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.send(err);
+  }
 };
 
 // @desc    Update contributor profile.
-// @route   PATCH account/{name}/update.
+// @route   PATCH account/account/:contrubutorId
 // @access  protected.
 const updateContributorProfile = async (req, res) => {
-  res.send("update profile");
+  const { name, email, social, profile } = req.body;
+
+  if (!req.user) {
+    return res.status(401).json({ message: "Access not authorized" });
+  }
+
+  const foundProfile = await Contributor.findById(req.user._id);
+
+  // Filter empty fields.
+  const data = {
+    name: name ? name : foundProfile.name,
+    email: email ? email : foundProfile.email,
+    social_link: social ? social : foundProfile.social_link,
+    profile_img: profile ? profile : foundProfile.profile_img,
+  };
+
+  try {
+    await Contributor.updateOne({ _id: req.user._id }, { ...data });
+    const updatedProfile = await Contributor.findById(req.user._id);
+    if (updatedProfile) {
+      return res.status(200).json({
+        message: "Profile modified",
+        user: {
+          id: updatedProfile._id,
+          name: updatedProfile.name,
+          email: updatedProfile.email,
+          social: updatedProfile.social_link,
+          profile: updatedProfile.profile_img,
+        },
+      });
+    } else {
+      return res.status(400).send("error acc");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Account may not be authorized" });
+  }
 };
-
-// @desc    Fetch contributor proverbs.
-// @route   GET proverb/{user}/:id/proverbs
-// @access  protected.
-const getContributorProverbs = async (req, res) => {
-  res.send("contributors proverbs");
-};
-
-// @desc    Fetch all proverbs.
-// @route   GET proverb/{user}/:id/proverbs/all
-// @access  protected.
-const getAllProverbs = async (req, res) => {
-  const proverbs = Proverbs.find({});
-  res.send("all proverbs");
-};
-
-// @desc    Retrieve lost account if opened locally.
-// const retrieveAccount = async (req, res) => {
-//   const { email } = req.body;
-
-//   if (!email) {
-//     return res.status(400).json({ message: "Email field can't be empty" });
-//   }
-
-//   const foundAccount = await Contributor.findOne({ email });
-// };
 
 module.exports = {
   registerContributor,
   getContributorProfile,
   updateContributorProfile,
   loginContributor,
-  getContributorProfile,
-  getAllProverbs,
 };

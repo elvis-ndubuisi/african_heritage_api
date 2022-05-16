@@ -5,9 +5,13 @@ const {
   updateContributorProfile,
   loginContributor,
 } = require("../controllers/contributor.controller");
+const authenticate = require("../middlewares/auth.middleware");
 
 router.post("/join", registerContributor);
 router.post("/login", loginContributor);
-router.route("/me").get(getContributorProfile).patch(updateContributorProfile);
+router
+  .route("/:contributorId")
+  .get(authenticate, getContributorProfile)
+  .patch(authenticate, updateContributorProfile);
 
 module.exports = router;

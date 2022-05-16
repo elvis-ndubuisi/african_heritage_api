@@ -21,8 +21,7 @@ const contributorSchema = new Schema(
       type: String,
       default: "",
     },
-    profile: { type: String, default: "", required: false },
-    token: { type: String },
+    profile_img: { type: String, default: "", required: false },
   },
   { timestamps: true }
 );
