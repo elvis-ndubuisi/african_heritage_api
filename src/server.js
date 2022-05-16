@@ -11,6 +11,10 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Routes.
+app.use("/account", require("./routes/contributor.routes"));
+app.use("/api/v1/", require("./routes/proverb.routes"));
+
 app.listen(PORT, async () => {
   await connectMongo();
   console.log(colors.yellow.bold(`> Server stated on port: ${PORT}`));

@@ -6,22 +6,15 @@ const proverbSchema = new Schema(
       type: String,
       required: [true, "Please provide a proverb"],
     },
-    lang: {
-      type: String,
-    },
-    added_by: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: "contributor",
-    },
-    unique_to: {
-      type: Array,
-      default: [],
-    },
-    translations: {
-      type: Array,
-      default: [],
-    },
+    lang: { type: String, default: "english" },
+    proverb_id: { type: Number },
+    // added_by: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    //   ref: "contributor",
+    // },
+    unique_to: { type: Array, default: [] },
+    translations: { type: Array, default: [] },
   },
   { timestamps: true }
 );

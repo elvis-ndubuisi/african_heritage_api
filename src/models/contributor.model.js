@@ -9,11 +9,9 @@ const contributorSchema = new Schema(
     email: {
       type: String,
       required: [true, "Please provide an email"],
+      unique: true,
     },
-    password: {
-      type: String,
-      required: [true, "Please provide a password"],
-    },
+    password: { type: String, required: false },
     country: {
       required: [true, "Please provide a country"],
       type: String,
@@ -24,6 +22,7 @@ const contributorSchema = new Schema(
       default: "",
     },
     profile: { type: String, default: "", required: false },
+    token: { type: String },
   },
   { timestamps: true }
 );
