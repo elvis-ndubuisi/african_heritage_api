@@ -7,9 +7,13 @@ const {
 } = require("../controllers/proverb.controller");
 const authenticate = require("../middlewares/auth.middleware");
 
-router.post("/proverb/contribute", authenticate, addProverb);
-router.patch("/proverb/:contributorId/edit", authenticate, editProverb);
-router.delete("/proverb/:contributorId/delete", authenticate, deleteProverb);
-router.get("/proverb/:contributorId", authenticate, getProverbs);
+router.post("cnt/contribute", authenticate, addProverb);
+router.patch("cnt/:contributorId/edit/:proverbId", authenticate, editProverb);
+router.delete(
+  "cnt/:contributorId/delete/:proverbId",
+  authenticate,
+  deleteProverb
+);
+router.get("cnt/:contributorId", authenticate, getProverbs);
 
 module.exports = router;

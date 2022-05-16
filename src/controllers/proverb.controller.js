@@ -1,12 +1,11 @@
 const colors = require("colors");
 const Proverb = require("../models/proverb.model");
-const Proverbs = require("../models/proverb.model");
 
 // @desc    Adds new proverb.
-// @route   POST proverb/contribute
+// @route   POST cnt/contribute
 // @access  protected.
 const addProverb = async (req, res) => {
-  const { quote, quote_native } = req.body;
+  const { quote, quote_native, unique_to, lang } = req.body;
 
   if (!quote) {
     return res.status(404).json({ message: "Please provide a proverb" });
@@ -18,64 +17,109 @@ const addProverb = async (req, res) => {
   }
 
   try {
-    const quote = await Proverbs.create({
+    // Check is quote is similar.
+    const foundProverb = Proverb.find({ quote });
+    if (foundProverb) {
+      return res.status(200).json({ message: "Proverb already present" });
+    }
+
+    const proverb = await Proverb.create({
       quote,
-      added_by: req.user.id,
       quote_native,
+      lang,
+      unique_to,
+      added_by: req.user.id,
     });
 
-    if (quote) {
-      res.status(201).json({ message: "Proverb added successfully" });
-    } else {
-      res.status(404).json({ message: "Invalid data" });
-    }
+    res.status(200).json({ message: "Proverb added successfully", proverb });
   } catch (err) {
-    res.status(500).json({ message: "Server Error" });
-    console.log(colors.bgRed.bold(err));
+    console.log(err);
+    res.status(500).json({ message: "something went wrong" });
   }
+
+  // try {
+  //   const quote = await Proverbs.create({
+  //     quote,
+  //     added_by: req.user.id,
+  //     quote_native,
+  //     unique_to,
+  //   });
+
+  //   if (quote) {
+  //     res.status(201).json({ message: "Proverb added successfully" });
+  //   } else {
+  //     res.status(404).json({ message: "Invalid data" });
+  //   }
+  // } catch (err) {
+  //   res.status(500).json({ message: "Server Error" });
+  //   console.log(colors.bgRed.bold(err));
+  // }
 };
 
 // @desc    Edit proverb.
-// @route   PATCH proverb/:contributorId/edit
+// @route   PATCH cnt/:proverbId/edit/:proverbId
 // @access  protected.
 const editProverb = async (req, res) => {
-  const { quote, quote_native, unique_to } = req.body;
+  const { quote, quote_native, unique_to, lang } = req.body;
+  const { contributorId, proverbId } = req.params;
 
-  if (!req.user) return res.status(401).json({ message: "Access denied" });
+  if (!req.user || !(req.user.id.toString() === contributorId))
+    return res.status(401).json({ message: "Access denied" });
 
   try {
-    const foundProverb = await Proverbs.findOne({ proverId: proverbId });
-    if (!foundProverb) {
-      return res
-        .status(404)
-        .json({ message: "Proverb not found. May already be deleted" });
-    }
-    const quote = await Proverbs.findOneAndUpdate({
-      proverb,
-      unique_to: unique_to_Arr,
-      translations: translationsObj,
+    const foundProverb = await Proverb.findOne({
+      added_by: req.user.id,
+      _id: proverbId,
     });
 
-    if (quote) {
-      res.status(201).json({ message: "Proverb updated successfully" });
-    } else {
-      res.status(404).json({ message: "Invalid data" });
-    }
+    if (!foundProverb)
+      return res.status(404).json({ message: "proverb not found" });
+
+    // Filter empty fields.
+    const data = {
+      quote: quote ? quote : foundProverb.quote,
+      email: quote_native ? quote_native : foundProverb.quote_native,
+      unique_to: lang ? lang : foundProverb.unique_to,
+      lang: lang ? lang : foundProverb.lang,
+    };
+    await Proverb.findByIdAndUpdate(proverbId, data);
+    const updatedProverb = await Proverb.findById(proverbId);
+    res.status(200).json({ message: "updated", updatedProverb });
   } catch (err) {
-    res.status(500).json({ message: "Server Error" });
-    console.log(colors.bgRed.bold(err));
+    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 // @desc    Delete proverb.
-// @route   DELETE proverb/:contributorId/delete
+// @route   DELETE cnt/:contributorId/delete/:proverbId
 // @access  protected.
 const deleteProverb = async (req, res) => {
-  res.send("delete proverb");
+  const { quote, quote_native, unique_to, lang } = req.body;
+  const { contributorId, proverbId } = req.params;
+
+  if (!req.user || !(req.user.id.toString() === contributorId))
+    return res.status(401).json({ message: "Access denied" });
+
+  try {
+    const foundProverb = await Proverb.findOne({
+      added_by: req.user.id,
+      _id: proverbId,
+    });
+
+    if (!foundProverb)
+      return res.status(404).json({ message: "proverb not found" });
+
+    const deletedProverb = await Proverb.findByIdAndDelete(proverbId);
+    res.status(200).json({ message: "deleted", deletedProverb });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 // @desc    Get a contributors proverbs.
-// @route   GET proverb/:contributorId/delete
+// @route   GET cnt/:contributorId/delete
 // @access  protected.
 const getProverbs = async (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Access denied" });
@@ -105,26 +149,17 @@ const getProverbs = async (req, res) => {
   }
 };
 
-// @desc    Fetch contributor proverbs.
-// @route   GET proverb/:contributorId
-// @access  protected.
-const getContributorProverbs = async (req, res) => {
-  res.send("contributors proverbs");
-};
-
-// @desc    Fetch all proverbs.
-// @route   GET proverb/{user}/:id/proverbs/all
-// @access  protected.
-const getAllProverbs = async (req, res) => {
-  const proverbs = Proverbs.find({});
-  res.send("all proverbs");
-};
-
-// @desc    Get proverb.
+// @desc    Get a proverb at random.
 // @route   GET proverb/
 // @access  public.
 const getRandomProverb = async (req, res) => {
-  res.send("random proverb");
+  try {
+    const proverbs = await Proverb.find();
+    res.send(proverbs);
+  } catch (err) {
+    console.log(err);
+    res.send("error ");
+  }
 };
 
 module.exports = {
@@ -132,6 +167,5 @@ module.exports = {
   editProverb,
   deleteProverb,
   getProverbs,
-  getContributorProverbs,
-  getAllProverbs,
+  getRandomProverb,
 };
