@@ -1,3 +1,4 @@
+const adageRoute = require("./routes/api.route");
 const authRoute = require("./routes/auth.route");
 const colors = require("colors");
 const cors = require("cors");
@@ -20,12 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes.
+app.use("/", adageRoute);
 app.use("/", authRoute);
 app.use("/", contRoute);
-app.use("/api", verifyAccessToken, (req, res) => {
-  console.log(req.payload);
-  res.send("index get");
-});
 
 app.use("*", (req, res, next) => {
   next(createErr.NotFound("This route doesn't exist"));
