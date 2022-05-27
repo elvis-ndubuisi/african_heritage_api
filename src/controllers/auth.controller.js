@@ -5,6 +5,7 @@ const { signAccessToken } = require("../helpers/jwt_auth");
 
 // @desc    Register new user, generate token.
 // @route   POST /account/register
+// @route   public
 const registerContributor = async (req, res, next) => {
   const { name, password, country, email, gender } = req.body;
 
@@ -54,6 +55,7 @@ const registerContributor = async (req, res, next) => {
 
 // @desc    Login registered user, verify token
 // @route   POST /account/login
+// @route   public
 const loginContributor = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -71,7 +73,7 @@ const loginContributor = async (req, res, next) => {
     if (!isMatch) throw createErr.Unauthorized("invalid email/password");
 
     const accessToken = await signAccessToken(foundContributor.id);
-    res.send({ accessToken });
+    res.json({ accessToken, isMatch });
   } catch (err) {
     next(err);
   }

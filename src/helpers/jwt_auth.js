@@ -12,7 +12,7 @@ module.exports = {
       const secret = process.env.ACCESS_TOKEN;
 
       const options = {
-        expiresIn: "10m",
+        expiresIn: "30m",
         issuer: "africa.com",
         audience: userId,
       };

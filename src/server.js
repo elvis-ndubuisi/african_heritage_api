@@ -26,8 +26,7 @@ app.use("/api", verifyAccessToken, (req, res) => {
   console.log(req.payload);
   res.send("index get");
 });
-// app.use("/", require("./routes/contributor.routes"));
-// app.use("/", require("./routes/proverb.routes"));
+
 app.use("*", (req, res, next) => {
   next(createErr.NotFound("This route doesn't exist"));
 });
