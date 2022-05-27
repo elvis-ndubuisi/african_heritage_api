@@ -1,7 +1,7 @@
 const createErr = require("http-errors");
 const Contributor = require("../models/contributor.model");
 const validate_email = require("../helpers/validate_email");
-const { signAccessToken } = require("../helpers/jwt_auth");
+const { signAccessToken, signRefreshToken } = require("../helpers/jwt_auth");
 
 // @desc    Register new user, generate token.
 // @route   POST /account/register
@@ -33,8 +33,9 @@ const registerContributor = async (req, res, next) => {
 
     const resp = await contributor.save();
     const accessToken = await signAccessToken(resp.id);
+    const refreshToken = await signRefreshToken(resp.id);
 
-    res.send({ accessToken });
+    res.send({ accessToken, refreshToken });
     // res.status(201).json({
     //   success: {
     //     status: 200,
@@ -73,7 +74,8 @@ const loginContributor = async (req, res, next) => {
     if (!isMatch) throw createErr.Unauthorized("invalid email/password");
 
     const accessToken = await signAccessToken(foundContributor.id);
-    res.json({ accessToken, isMatch });
+    const refreshToken = await signRefreshToken(foundContributor.id);
+    res.json({ accessToken, refreshToken });
   } catch (err) {
     next(err);
   }

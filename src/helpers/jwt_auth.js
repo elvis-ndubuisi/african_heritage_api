@@ -12,7 +12,7 @@ module.exports = {
       const secret = process.env.ACCESS_TOKEN;
 
       const options = {
-        expiresIn: "30m",
+        expiresIn: "1",
         issuer: "africa.com",
         audience: userId,
       };
@@ -42,6 +42,28 @@ module.exports = {
       }
       req.payload = payload;
       next();
+    });
+  },
+  signRefreshToken: (userId) => {
+    return new Promise((resolve, reject) => {
+      const payload = {
+        name: "payload",
+      };
+
+      const secret = process.env.REFRESH_TOKEN;
+
+      const options = {
+        expiresIn: "30m",
+        issuer: "africa.com",
+        audience: userId,
+      };
+      jwt.sign(payload, secret, options, (err, token) => {
+        if (err) {
+          console.log(err.message);
+          return reject(createErr.InternalServerError());
+        }
+        resolve(token);
+      });
     });
   },
 };
