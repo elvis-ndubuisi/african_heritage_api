@@ -7,6 +7,7 @@ const createErr = require("http-errors");
 const express = require("express");
 const helmet = require("helmet");
 const initMongo = require("./helpers/init_mongoDb");
+const initRedis = require("./helpers/init_redis");
 const morgan = require("morgan");
 require("dotenv").config();
 const { verifyAccessToken } = require("./helpers/jwt_auth");
@@ -41,7 +42,8 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, async () => {
   console.log("\t--------------------------------".blue);
-  await initMongo();
+  // await initMongo();
+  await initRedis();
   console.log(colors.green.bold(`\t=> Server stated on port: ${PORT}`));
   console.log("\t--------------------------------".blue);
 });
