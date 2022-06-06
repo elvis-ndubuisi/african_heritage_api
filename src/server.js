@@ -8,7 +8,7 @@ const express = require("express");
 const helmet = require("helmet");
 const initMongo = require("./helpers/init_mongoDb");
 const redisClient = require("./helpers/redis_client");
-// const { initRedis, setValue, getValue } = require("./helpers/init_redis");
+
 const morgan = require("morgan");
 require("dotenv").config();
 const { verifyAccessToken } = require("./helpers/jwt_auth");
