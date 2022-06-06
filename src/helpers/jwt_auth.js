@@ -54,7 +54,7 @@ module.exports = {
       const secret = process.env.REFRESH_TOKEN;
 
       const options = {
-        expiresIn: "60s",
+        expiresIn: "240s",
         issuer: "africa.com",
         audience: userId,
       };
@@ -64,21 +64,33 @@ module.exports = {
           return reject(createErr.InternalServerError());
         }
         try {
-          await redisClient.SET(userId, token, { EX: 60 });
+          await redisClient.SET(userId, token, { EX: 240 });
           resolve(token);
         } catch (err) {
-          return reject(createErr.InternalServerError);
+          return reject(createErr.InternalServerError());
         }
       });
     });
   },
   verifyRefreshToken: (refreshToken) => {
     return new Promise((resolve, reject) => {
-      jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, payload) => {
-        if (err) return reject(createErr.Unauthorized());
-        const userId = payload.aud;
-        resolve(userId);
-      });
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN,
+        async (err, payload) => {
+          if (err) return reject(createErr.Unauthorized());
+          const userId = payload.aud;
+
+          try {
+            const refToken = await redisClient.GET(userId);
+            if (refreshToken === refToken) return resolve(userId);
+            reject(createErr.Unauthorized());
+          } catch (err) {
+            reject(createErr.InternalServerError());
+          }
+          resolve(userId);
+        }
+      );
     });
   },
 };
