@@ -1,7 +1,6 @@
 const createErr = require("http-errors");
 const Contributor = require("../models/contributor.model");
 const validate_email = require("../helpers/validate_email");
-
 const {
   signAccessToken,
   signRefreshToken,
