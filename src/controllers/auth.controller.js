@@ -1,7 +1,13 @@
 const createErr = require("http-errors");
 const Contributor = require("../models/contributor.model");
 const validate_email = require("../helpers/validate_email");
-const { signAccessToken, signRefreshToken } = require("../helpers/jwt_auth");
+
+const {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} = require("../helpers/jwt_auth");
+const redisClient = require("../helpers/redis_client");
 
 // @desc    Register new user, generate token.
 // @route   POST /account/register
@@ -81,7 +87,45 @@ const loginContributor = async (req, res, next) => {
   }
 };
 
+// @desc    Verifies refreshTokens and generates new refreshToken and accessToken
+// @route   POST /account/ref
+// @route   public
+const generateNewRefreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createErr.BadRequest();
+
+    const userId = await verifyRefreshToken(refreshToken);
+    const accessToken = await signAccessToken(userId);
+    const refToken = await signRefreshToken(userId);
+    res.send({ accessToken, refreshToken: refToken });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Verifies refreshTokens and generates new refreshToken and accessToken
+// @route   DELETE /account/logout
+// @route   public
+const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createErr.BadRequest();
+
+    const userId = await verifyRefreshToken(refreshToken);
+
+    const resp = await redisClient.DEL(userId);
+    if (resp) {
+      return res.sendStatus(204);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   register: registerContributor,
   login: loginContributor,
+  newToken: generateNewRefreshToken,
+  logout,
 };
