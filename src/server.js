@@ -10,7 +10,6 @@ const initMongo = require("./helpers/init_mongoDb");
 const redisClient = require("./helpers/redis_client");
 const morgan = require("morgan");
 require("dotenv").config();
-const { verifyAccessToken } = require("./helpers/jwt_auth");
 
 const app = express();
 const PORT = process.env.port || 8080;
