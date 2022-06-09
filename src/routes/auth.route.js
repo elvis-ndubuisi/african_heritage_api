@@ -1,3 +1,5 @@
+const cors = require("cors");
+const corsConfig = require("../config/cors.config");
 const router = require("express").Router();
 const {
   register,
@@ -6,6 +8,7 @@ const {
   logout,
 } = require("../controllers/auth.controller");
 
+router.options(cors(corsConfig.contributorCORS));
 router.post("/account/register", register);
 router.post("/account/login", login);
 router.post("/account/ref", newToken);

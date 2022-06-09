@@ -38,7 +38,6 @@ contributorSchema.pre("save", async function (next) {
     const hashed = await bcrypt.hash(this.password, salt);
     this.password = hashed;
     next();
-    console.log(this.password);
   } catch (err) {
     next(err);
   }

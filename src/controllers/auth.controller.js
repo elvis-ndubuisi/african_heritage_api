@@ -40,7 +40,17 @@ const registerContributor = async (req, res, next) => {
     const accessToken = await signAccessToken(resp.id);
     const refreshToken = await signRefreshToken(resp.id);
 
-    res.send({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 900000,
+    });
+    res.send({
+      accessToken,
+      name: resp.name,
+      country: resp.country,
+      gender: resp.gender,
+      email: resp.email,
+    });
   } catch (err) {
     next(err);
   }
@@ -67,7 +77,17 @@ const loginContributor = async (req, res, next) => {
 
     const accessToken = await signAccessToken(foundContributor.id);
     const refreshToken = await signRefreshToken(foundContributor.id);
-    res.send({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 900000,
+    });
+    res.send({
+      accessToken,
+      name: foundContributor.name,
+      email: foundContributor.email,
+      country: foundContributor.country,
+      gender: foundContributor.gender,
+    });
   } catch (err) {
     next(err);
   }
@@ -78,28 +98,28 @@ const loginContributor = async (req, res, next) => {
 // @route   public
 const generateNewRefreshToken = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) throw createErr.BadRequest();
 
     const userId = await verifyRefreshToken(refreshToken);
     const accessToken = await signAccessToken(userId);
-    const refToken = await signRefreshToken(userId);
-    res.send({ accessToken, refreshToken: refToken });
+    await signRefreshToken(userId);
+    res.send({ accessToken });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Verifies refreshTokens and generates new refreshToken and accessToken
+// @desc    Verifies refreshTokens and deletes token from cookie and redis store.
 // @route   DELETE /account/logout
 // @route   public
 const logout = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) throw createErr.BadRequest();
-
     const userId = await verifyRefreshToken(refreshToken);
 
+    res.clearCookie("refreshToken", { httpOnly: true });
     const resp = await redisClient.DEL(userId);
     if (resp) {
       return res.sendStatus(204);
