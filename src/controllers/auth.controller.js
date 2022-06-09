@@ -42,7 +42,7 @@ const registerContributor = async (req, res, next) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      maxAge: 900000,
+      maxAge: 86400,
     });
     res.send({
       accessToken,
@@ -79,7 +79,7 @@ const loginContributor = async (req, res, next) => {
     const refreshToken = await signRefreshToken(foundContributor.id);
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      maxAge: 900000,
+      maxAge: 86400,
     });
     res.send({
       accessToken,

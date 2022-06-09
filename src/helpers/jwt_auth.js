@@ -13,7 +13,7 @@ module.exports = {
       const secret = process.env.ACCESS_TOKEN;
 
       const options = {
-        expiresIn: "1m",
+        expiresIn: "30m",
         issuer: "africa adage",
         audience: userId,
       };
@@ -54,7 +54,7 @@ module.exports = {
       const secret = process.env.REFRESH_TOKEN;
 
       const options = {
-        expiresIn: "240s",
+        expiresIn: "24h",
         issuer: "africa.com",
         audience: userId,
       };
@@ -64,7 +64,7 @@ module.exports = {
           return reject(createErr.InternalServerError());
         }
         try {
-          await redisClient.SET(userId, token, { EX: 240 });
+          await redisClient.SET(userId, token, { EX: 86400 });
           resolve(token);
         } catch (err) {
           return reject(createErr.InternalServerError());
