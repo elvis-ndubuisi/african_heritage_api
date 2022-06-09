@@ -1,4 +1,4 @@
-const whiteList = ["http://localhost:34623"];
+const whiteList = ["http://localhost:8080"];
 
 const contributorCORS = {
   origin: (origin, callback) => {

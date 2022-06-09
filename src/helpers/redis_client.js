@@ -4,7 +4,7 @@ const colors = require("colors");
 const redisClient = redis.createClient({ url: "redis://localhost:6379" });
 
 redisClient.on("connect", () => {
-  console.log("\tINIT:".yellow.bold + "\tCacheSys");
+  console.log("\tInit:".yellow.bold + "\tCacheSys");
 });
 
 redisClient.on("ready", () => {

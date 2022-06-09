@@ -1,6 +1,5 @@
 const cron = require("node-cron");
 const redisClient = require("./redis_client");
-const Adage = require("../models/adage.model");
 
 module.exports = {
   postAdageOnTwitter: () => {
@@ -9,10 +8,11 @@ module.exports = {
       console.log("post on twitter");
     });
   },
-  cacheAdageOfTheDay: () => {
-    cron.schedule("0 0 * *", () => {
-      // Generate and cache adage of the day every 12am
-      redisClient.SET("aod", "adage", { EX: 86400 });
+  cacheAdageOfTheDay: (fn) => {
+    cron.schedule("0 0 * * *", async () => {
+      // Generates and cache random adage of the day every 12am
+      const value = await fn();
+      redisClient.SET("adage", value.adage.adage.toString(), { EX: 86400 });
     });
   },
 };
