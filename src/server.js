@@ -13,6 +13,7 @@ const redisClient = require("./helpers/redis_client");
 const morgan = require("morgan");
 const { cacheAdageOfTheDay, postAdageOnTwitter } = require("./helpers/jobs");
 require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.port || 5000;
@@ -22,6 +23,7 @@ cacheAdageOfTheDay(genRandomAdage);
 postAdageOnTwitter();
 
 app.use(morgan("dev"));
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

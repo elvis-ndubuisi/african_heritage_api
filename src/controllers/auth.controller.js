@@ -43,6 +43,8 @@ const registerContributor = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 86400,
+      sameSite: "None",
+      secure: true,
     });
     res.send({
       accessToken,
@@ -80,6 +82,8 @@ const loginContributor = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 86400,
+      sameSite: "None",
+      secure: true,
     });
     res.send({
       accessToken,
@@ -119,7 +123,11 @@ const logout = async (req, res, next) => {
     if (!refreshToken) throw createErr.BadRequest();
     const userId = await verifyRefreshToken(refreshToken);
 
-    res.clearCookie("refreshToken", { httpOnly: true });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
     const resp = await redisClient.DEL(userId);
     if (resp) {
       return res.sendStatus(204);
