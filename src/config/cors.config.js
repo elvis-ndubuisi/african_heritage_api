@@ -1,17 +1,10 @@
 const allowOrigins = ["http://localhost:8080", "http://localhost:5000"];
 
 const contributorCORS = {
-  origin: (origin, callback) => {
-    if (allowOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: "http://localhost:8080",
   methods: ["GET", "POST", "PATCH", "DELETE"],
   optionsSuccessStatus: 200,
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 const corsOptionsDelegate = (req, fn) => {

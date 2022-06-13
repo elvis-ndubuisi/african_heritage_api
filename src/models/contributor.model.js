@@ -8,25 +8,30 @@ const contributorSchema = new Schema(
       required: true,
       unique: false,
       max: 18,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       lowercase: true,
       unique: true,
+      trim: true,
     },
     password: {
       type: String,
       required: true,
       min: 6,
+      trim: true,
     },
     country: {
       type: String,
       required: true,
+      trim: true,
     },
     gender: {
       type: String,
       required: true,
+      trim: true,
     },
   },
   { timestamps: true }

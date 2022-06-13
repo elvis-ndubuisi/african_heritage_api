@@ -1,4 +1,5 @@
 const Adage = require("../models/adage.model");
+const createErr = require("http-errors");
 
 const gen_randomAdage = async (field) => {
   /* Returns a randomly selected document from Adage collection */
@@ -8,8 +9,8 @@ const gen_randomAdage = async (field) => {
   if (!field) {
     adage = await Adage.findOne().skip(seed);
   } else {
-    console.log(field);
-    adage = await Adage.findOne({ field }).skip(seed);
+    adage = await Adage.findOne({ country: field }).skip(seed);
+    if (!adage) throw createErr.NotFound("No adage found");
   }
   return { adage, seed };
 };

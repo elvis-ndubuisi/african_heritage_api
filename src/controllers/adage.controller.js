@@ -8,7 +8,6 @@ const redisClient = require("../helpers/redis_client");
 const getRandAdage = async (req, res, next) => {
   try {
     const value = await genRandomAdage();
-    console.log(value);
     res.json({
       adage: value.adage.adage,
       country: value.adage.country,
@@ -41,8 +40,7 @@ const queryAdage = async (req, res, next) => {
 // @access  public
 const adageOfTheDay = async (req, res, next) => {
   const adage = await redisClient.GET("adage");
-  if (!adage)
-    throw createErr.NotFound("Oops... seems the adage is not ready yet!");
+  if (!adage) throw createErr.NotFound("Oops... seems no adage is cached yet!");
   res.send(adage);
 };
 
