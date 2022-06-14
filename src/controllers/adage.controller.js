@@ -42,7 +42,7 @@ const adageOfTheDay = async (req, res, next) => {
   const adage = await redisClient.GET("adage");
   try {
     if (!adage)
-      throw createErr.NotFound("Oops... seems no adage is cached yet!");
+      throw createErr.NotFound("Oops... seems no adage is cached yet!...");
     res.send(adage);
   } catch (err) {
     next(err);

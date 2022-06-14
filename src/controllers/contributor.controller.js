@@ -131,14 +131,25 @@ const patchProfile = async (req, res, next) => {
 //@route    GET /cnt/profile
 // @access  protected
 const getContributorAdages = async (req, res, next) => {
-  const { page, limit } = req.query;
-
   try {
+    let { page, size } = req.query;
+
+    // Set default pagination params.
+    if (!page) page = 1;
+    if (!size) size = 3;
+
+    const limit = parseInt(size);
+    const skip = (page - 1) * size;
+
     if (!req.payload.aud) throw createErr.Forbidden();
-    const adages = await Adage.find({ owner: req.payload.aud });
-    // Paginate adage
-    // Return paginated adages, current page and current limit
-    res.send(adages);
+    const adages = await Adage.find({ owner: req.payload.aud })
+      .limit(limit)
+      .skip(skip);
+    res.send({
+      page,
+      size,
+      data: adages,
+    });
   } catch (err) {
     next(err);
   }
