@@ -1,30 +1,39 @@
-const adageRoute = require("./routes/api.route");
+const adageRoute = require("./routes/adage.route");
 const authRoute = require("./routes/auth.route");
 const colors = require("colors");
-const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const contRoute = require("./routes/contributor.route");
+const cors = require("cors");
+const corsConfig = require("./config/cors.config");
 const createErr = require("http-errors");
 const express = require("express");
+const genRandomAdage = require("./helpers/gen_randomAdage");
 const helmet = require("helmet");
+const initAdage = require("./helpers/init_adage");
 const initMongo = require("./helpers/init_mongoDb");
+const jobs = require("./helpers/jobs");
 const redisClient = require("./helpers/redis_client");
 const morgan = require("morgan");
 require("dotenv").config();
-const { verifyAccessToken } = require("./helpers/jwt_auth");
 
 const app = express();
-const PORT = process.env.port || 8080;
+const PORT = process.env.port || 5000;
 
-app.use(helmet());
-app.use(cors());
+// Jobs
+jobs.cacheAdageOfTheDay(genRandomAdage);
+jobs.postAdageOnTwitter();
+
+// Dependencies
 app.use(morgan("dev"));
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Routes.
-app.use("/", adageRoute);
-app.use("/", authRoute);
-app.use("/", contRoute);
+app.use("/account", cors(corsConfig.contributorCORS), authRoute);
+app.use("/cnt/profile", cors(corsConfig.contributorCORS), contRoute);
+app.use("/", cors(corsConfig.apiCORS), adageRoute);
 
 app.use("*", (req, res, next) => {
   next(createErr.NotFound("This route doesn't exist"));
@@ -40,10 +49,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Initialize Server.
 app.listen(PORT, async () => {
-  console.log("\t--------------------------------".blue);
+  console.log("****************************************".green);
   await redisClient.connect();
   await initMongo();
-  console.log(colors.green.bold(`\t=> Server stated on port: ${PORT}`));
-  console.log("\t--------------------------------".blue);
+  console.log(colors.cyan.underline.bold(`\tserver ready`));
+  console.log("****************************************".green);
+  await initAdage(genRandomAdage);
 });

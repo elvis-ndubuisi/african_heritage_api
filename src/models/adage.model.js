@@ -9,12 +9,14 @@ const adageSchema = new Schema(
       unique: true,
       min: [10, "Adage too small, Must exceed 10 characters"],
       max: [80, "Adage too long, must not exceed 80 characters"],
+      trim: true,
     },
     tags: [String],
     country: {
       type: String,
       required: true,
       lowercase: true,
+      trim: true,
     },
     owner: {
       type: Schema.Types.ObjectId,

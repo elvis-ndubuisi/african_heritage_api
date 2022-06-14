@@ -6,9 +6,9 @@ const {
   logout,
 } = require("../controllers/auth.controller");
 
-router.post("/account/register", register);
-router.post("/account/login", login);
-router.post("/account/ref", newToken);
-router.delete("/account/logout", logout);
+router.post("/register", register);
+router.post("/login", login);
+router.post("/ref", newToken);
+router.delete("/logout", logout);
 
 module.exports = router;

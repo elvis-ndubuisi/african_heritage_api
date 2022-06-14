@@ -8,7 +8,7 @@ const {
 } = require("../helpers/jwt_auth");
 const redisClient = require("../helpers/redis_client");
 
-// @desc    Register new user, generate token.
+// @desc    Register new user, generate tokens.
 // @route   POST /account/register
 // @route   public
 const registerContributor = async (req, res, next) => {
@@ -40,26 +40,25 @@ const registerContributor = async (req, res, next) => {
     const accessToken = await signAccessToken(resp.id);
     const refreshToken = await signRefreshToken(resp.id);
 
-    res.send({ accessToken, refreshToken });
-    // res.status(201).json({
-    //   success: {
-    //     status: 200,
-    //     message: "Contributor details accepted",
-    //     contributor: {
-    //       name: resp.name,
-    //       id: resp._id,
-    //       email: resp.email,
-    //       gender: resp.gender,
-    //       country: resp.country,
-    //     },
-    //   },
-    // });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 86400,
+      sameSite: "None",
+      secure: true,
+    });
+    res.send({
+      accessToken,
+      name: resp.name,
+      country: resp.country,
+      gender: resp.gender,
+      email: resp.email,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Login registered user, verify token
+// @desc    Login registered user, generate tokens.
 // @route   POST /account/login
 // @route   public
 const loginContributor = async (req, res, next) => {
@@ -80,39 +79,55 @@ const loginContributor = async (req, res, next) => {
 
     const accessToken = await signAccessToken(foundContributor.id);
     const refreshToken = await signRefreshToken(foundContributor.id);
-    res.json({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 86400,
+      sameSite: "None",
+      secure: true,
+    });
+    res.send({
+      accessToken,
+      name: foundContributor.name,
+      email: foundContributor.email,
+      country: foundContributor.country,
+      gender: foundContributor.gender,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Verifies refreshTokens and generates new refreshToken and accessToken
-// @route   POST /account/ref
+// @desc    Verifies refreshToken and generates new refreshToken and accessToken.
+// @route   POST /account/verify
 // @route   public
 const generateNewRefreshToken = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) throw createErr.BadRequest();
 
     const userId = await verifyRefreshToken(refreshToken);
     const accessToken = await signAccessToken(userId);
-    const refToken = await signRefreshToken(userId);
-    res.send({ accessToken, refreshToken: refToken });
+    await signRefreshToken(userId);
+    res.send({ accessToken });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Verifies refreshTokens and generates new refreshToken and accessToken
+// @desc    Verifies refreshTokens and deletes token from cookie and redis store.
 // @route   DELETE /account/logout
 // @route   public
 const logout = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) throw createErr.BadRequest();
-
     const userId = await verifyRefreshToken(refreshToken);
 
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
     const resp = await redisClient.DEL(userId);
     if (resp) {
       return res.sendStatus(204);

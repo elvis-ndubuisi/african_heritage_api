@@ -13,6 +13,8 @@ const postAdage = async (req, res, next) => {
     if (!adage || !country)
       throw createErr.BadRequest("provide required fields");
 
+    if (!req.payload.aud) throw createErr.Forbidden();
+
     const similarAdage = await Adage.findOne({ adage });
 
     if (similarAdage)
@@ -50,6 +52,8 @@ const patchAdage = async (req, res, next) => {
     if (!id || !adage.toString())
       throw createErr.BadRequest("provide an adage");
 
+    if (!aud) throw createErr.Forbidden();
+
     const foundAdage = await Adage.findById({ _id: id });
     if (!foundAdage) throw createErr.NotFound("requested adage not found");
 
@@ -73,6 +77,7 @@ const deleteAdage = async (req, res, next) => {
 
   try {
     if (!id) throw createErr.BadRequest();
+    if (!aud) throw createErr.Forbidden();
 
     const foundAdage = await Adage.findOne({ id });
 
@@ -122,7 +127,25 @@ const patchProfile = async (req, res, next) => {
   }
 };
 
+// @desc    Get adages
+//@route    GET /cnt/profile
+// @access  protected
+const getContributorAdages = async (req, res, next) => {
+  const { page, limit } = req.query;
+
+  try {
+    if (!req.payload.aud) throw createErr.Forbidden();
+    const adages = await Adage.find({ owner: req.payload.aud });
+    // Paginate adage
+    // Return paginated adages, current page and current limit
+    res.send(adages);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
+  getAdages: getContributorAdages,
   addAdage: postAdage,
   editAdage: patchAdage,
   deleteAdage,

@@ -3,16 +3,17 @@ const colors = require("colors");
 
 const init_mongoDb = async () => {
   mongoose.connection.once("connecting", () => {
-    console.log(`\tConnecting to MongoDatabase`.italic.magenta);
+    console.log("\tInit:".yellow.bold + "\tDatabase");
   });
 
   mongoose.connection.on("reconnected", () => {
-    console.log("\tReconnected".italic.green);
+    console.log("\tReconnect Database".italic.green);
   });
 
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`\tMongo Connected => ${conn.connection.host}`.cyan.underline);
+    console.log("\tReady:".yellow.bold + "\tDatabase");
+    // console.log(`\tMongo Connected => ${conn.connection.host}`.cyan.underline);
   } catch (err) {
     console.log(`\t${err}`.red.bold);
     process.exit(1);
