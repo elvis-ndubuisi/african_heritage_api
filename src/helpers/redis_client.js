@@ -1,7 +1,11 @@
 const redis = require("redis");
 const colors = require("colors");
+require("dotenv").config();
 
-const redisClient = redis.createClient({ url: "redis://localhost:6379" });
+const redisClient = redis.createClient({
+  url: process.env.REDIS_URL,
+  password: process.env.REDIS_PASSWORD,
+});
 
 redisClient.on("connect", () => {
   console.log("\tInit:".yellow.bold + "\tCacheSys");
