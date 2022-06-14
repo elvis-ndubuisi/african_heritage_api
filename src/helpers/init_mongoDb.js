@@ -11,13 +11,10 @@ const init_mongoDb = async () => {
   });
 
   try {
-    const conn = await mongoose.connect(
-      `${process.env.MONGODB_URI}/africanAdage`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("\tReady:".yellow.bold + "\tDatabase");
     // console.log(`\tMongo Connected => ${conn.connection.host}`.cyan.underline);
   } catch (err) {
