@@ -11,8 +11,12 @@ module.exports = {
   cacheAdageOfTheDay: (fn) => {
     cron.schedule("0 0 * * *", async () => {
       // Generates and cache random adage of the day every 12am
-      const value = await fn();
-      redisClient.SET("adage", value.adage.adage.toString(), { EX: 86400 });
+      try {
+        const value = await fn();
+        redisClient.SET("adage", value.adage.adage.toString(), { EX: 86400 });
+      } catch (err) {
+        console.error(err);
+      }
     });
   },
 };
