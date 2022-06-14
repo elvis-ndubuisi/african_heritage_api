@@ -35,6 +35,13 @@ app.use("/account", cors(corsConfig.contributorCORS), authRoute);
 app.use("/cnt/profile", cors(corsConfig.contributorCORS), contRoute);
 app.use("/", cors(corsConfig.apiCORS), adageRoute);
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    name: "African Adage API",
+    owner: "Elvis Victor",
+  });
+});
+
 app.use("*", (req, res, next) => {
   next(createErr.NotFound("This route doesn't exist"));
 });
