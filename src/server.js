@@ -56,5 +56,5 @@ app.listen(PORT, async () => {
   await initMongo();
   console.log(colors.cyan.underline.bold(`\tserver ready`));
   console.log("****************************************".green);
-  await initAdage(genRandomAdage);
+  // await initAdage(genRandomAdage);
 });
