@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const colors = require("colors");
+require("dotenv").config();
 
 const init_mongoDb = async () => {
   mongoose.connection.once("connecting", () => {
@@ -14,6 +15,7 @@ const init_mongoDb = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: "africanAdage",
     });
     console.log("\tReady:".yellow.bold + "\tDatabase");
     // console.log(`\tMongo Connected => ${conn.connection.host}`.cyan.underline);

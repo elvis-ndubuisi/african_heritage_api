@@ -40,8 +40,13 @@ const queryAdage = async (req, res, next) => {
 // @access  public
 const adageOfTheDay = async (req, res, next) => {
   const adage = await redisClient.GET("adage");
-  if (!adage) throw createErr.NotFound("Oops... seems no adage is cached yet!");
-  res.send(adage);
+  try {
+    if (!adage)
+      throw createErr.NotFound("Oops... seems no adage is cached yet!");
+    res.send(adage);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
