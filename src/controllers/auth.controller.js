@@ -107,7 +107,13 @@ const generateNewRefreshToken = async (req, res, next) => {
 
     const userId = await verifyRefreshToken(refreshToken);
     const accessToken = await signAccessToken(userId);
-    await signRefreshToken(userId);
+    const refT = await signRefreshToken(userId);
+    res.cookie("refreshToken", refT, {
+      httpOnly: true,
+      maxAge: 86400,
+      sameSite: "None",
+      secure: true,
+    });
     res.send({ accessToken });
   } catch (err) {
     next(err);

@@ -34,7 +34,12 @@ const postAdage = async (req, res, next) => {
     });
     const addedAdage = await newAdage.save();
 
-    res.send(addedAdage);
+    res.send({
+      adage: addedAdage.adage,
+      country: addedAdage.country,
+      id: addedAdage.id,
+      tags: addedAdage.tags,
+    });
   } catch (err) {
     next(err);
   }
@@ -62,7 +67,12 @@ const patchAdage = async (req, res, next) => {
 
     const updatedAdage = await Adage.updateOne({ id, owner: aud }, { adage });
     if (!updatedAdage) throw createErr.InternalServerError();
-    res.send("successful edit");
+    res.send({
+      adage: updatedAdage.adage,
+      country: updatedAdage.country,
+      tags: updatedAdage.tags,
+      id: updatedAdage.id,
+    });
   } catch (err) {
     next(err);
   }
@@ -76,7 +86,7 @@ const deleteAdage = async (req, res, next) => {
   const { aud } = req.payload;
 
   try {
-    if (!id) throw createErr.BadRequest();
+    if (!id) throw createErr.BadRequest("provide adage id");
     if (!aud) throw createErr.Forbidden();
 
     const foundAdage = await Adage.findOne({ id });
@@ -131,14 +141,37 @@ const patchProfile = async (req, res, next) => {
 //@route    GET /cnt/profile
 // @access  protected
 const getContributorAdages = async (req, res, next) => {
-  const { page, limit } = req.query;
-
   try {
+    let { page, size } = req.query;
+
+    // Set default pagination params.
+    if (!page) page = 1;
+    if (!size) size = 3;
+
+    const limit = parseInt(size);
+    const skip = (page - 1) * size;
+
     if (!req.payload.aud) throw createErr.Forbidden();
-    const adages = await Adage.find({ owner: req.payload.aud });
-    // Paginate adage
-    // Return paginated adages, current page and current limit
-    res.send(adages);
+    const count = await Adage.find({ owner: req.payload.aud }).countDocuments();
+    const adages = await Adage.find({ owner: req.payload.aud })
+      .limit(limit)
+      .skip(skip);
+
+    const data = adages.map((adage) => {
+      return {
+        adage: adage.adage,
+        country: adage.country,
+        tags: adage.tags,
+        id: adage.id,
+      };
+    });
+
+    res.send({
+      page: parseInt(page),
+      size: parseInt(size),
+      count,
+      data,
+    });
   } catch (err) {
     next(err);
   }
