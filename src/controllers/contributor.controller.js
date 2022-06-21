@@ -7,6 +7,48 @@ const validate_email = require("../helpers/validate_email");
 // @route   POST /cnt/profile/adage
 // @access  protected
 const postAdage = async (req, res, next) => {
+  const { adage, tags, uniqueTo } = req.body;
+
+  try {
+    if (!adage || !uniqueTo)
+      throw createErr.BadRequest("provide required fields");
+
+    if (!req.payload.aud) throw createErr.Forbidden();
+
+    const similarAdage = await Adage.findOne({ adage });
+
+    if (similarAdage)
+      throw createErr.Conflict({
+        message: "similar adage already exist",
+        adage,
+      });
+    //   Find owner.
+    const foundOwner = Contributor.findById(req.payload.aud);
+    if (!foundOwner) throw createErr.NotFound("account not found");
+
+    const newAdage = new Adage({
+      adage,
+      country: uniqueTo,
+      //   tags: tags !== [] ? tags.forEach((tag) => tags.push(tag)) : tags,
+      owner: req.payload.aud,
+    });
+    const addedAdage = await newAdage.save();
+
+    res.send({
+      adage: addedAdage.adage,
+      country: addedAdage.country,
+      id: addedAdage.id,
+      tags: addedAdage.tags,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Add adage
+// @route   POST /cnt/profile/adage
+// @access  protected
+const postBatchAdage = async (req, res, next) => {
   const { adage, tags, country } = req.body;
 
   try {
@@ -153,6 +195,11 @@ const getContributorAdages = async (req, res, next) => {
 
     if (!req.payload.aud) throw createErr.Forbidden();
     const count = await Adage.find({ owner: req.payload.aud }).countDocuments();
+
+    if (count === 0) {
+      return res.send({ page: 0, size: 0, count: 0, data: [] });
+    }
+
     const adages = await Adage.find({ owner: req.payload.aud })
       .limit(limit)
       .skip(skip);
