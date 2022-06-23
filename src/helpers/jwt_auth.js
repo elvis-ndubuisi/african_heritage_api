@@ -56,7 +56,7 @@ module.exports = {
 
       const options = {
         expiresIn: "24h",
-        issuer: "africa.com",
+        issuer: "African Heritage",
         audience: userId,
       };
       jwt.sign(payload, secret, options, async (err, token) => {
