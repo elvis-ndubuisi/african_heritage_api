@@ -11,10 +11,18 @@ const adageSchema = new Schema(
       max: [80, "Adage too long, must not exceed 80 characters"],
       trim: true,
     },
-    tags: [String],
-    country: {
+    translations: {
+      type: Map,
+      of: String,
+    },
+    interpretation: {
       type: String,
-      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    tags: [String],
+    uniqueTo: {
+      type: String,
       lowercase: true,
       trim: true,
     },

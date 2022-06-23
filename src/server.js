@@ -9,7 +9,6 @@ const createErr = require("http-errors");
 const express = require("express");
 const genRandomAdage = require("./helpers/gen_randomAdage");
 const helmet = require("helmet");
-const initAdage = require("./helpers/init_adage");
 const initMongo = require("./helpers/init_mongoDb");
 const jobs = require("./helpers/jobs");
 const redisClient = require("./helpers/redis_client");
@@ -37,8 +36,9 @@ app.use("/", cors(corsConfig.apiCORS), adageRoute);
 
 app.get("/", (req, res) => {
   res.status(200).json({
-    name: "African Adage API",
-    owner: "Elvis Victor",
+    name: "African Heritage API",
+    owner: "Elvis Ndubuisi Victor",
+    twitter: "https://twitter.com/_ndubuisi_elvis",
   });
 });
 
@@ -63,5 +63,4 @@ app.listen(PORT, async () => {
   await initMongo();
   console.log(colors.cyan.underline.bold(`\tserver ready`));
   console.log("****************************************".green);
-  // await initAdage(genRandomAdage);
 });

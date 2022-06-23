@@ -7,7 +7,7 @@ const validate_email = require("../helpers/validate_email");
 // @route   POST /cnt/profile/adage
 // @access  protected
 const postAdage = async (req, res, next) => {
-  const { adage, tags, uniqueTo } = req.body;
+  const { adage, tags, uniqueTo, interpretation, translations } = req.body;
 
   try {
     if (!adage || !uniqueTo)
@@ -28,52 +28,54 @@ const postAdage = async (req, res, next) => {
 
     const newAdage = new Adage({
       adage,
-      country: uniqueTo,
-      //   tags: tags !== [] ? tags.forEach((tag) => tags.push(tag)) : tags,
+      uniqueTo: uniqueTo,
+      tags: [],
+      interpretation: interpretation,
+      translations: translations,
       owner: req.payload.aud,
     });
-    const addedAdage = await newAdage.save();
+    await newAdage.save();
 
     res.send({
-      adage: addedAdage.adage,
-      country: addedAdage.country,
-      id: addedAdage.id,
-      tags: addedAdage.tags,
+      status: "success",
+      message: "adage added",
     });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Add adage
-// @route   POST /cnt/profile/adage
+// @desc    Add adages
+// @route   POST /cnt/profile/adage/batch
 // @access  protected
 const postBatchAdage = async (req, res, next) => {
-  const { adage, tags, country } = req.body;
+  const { patchObject } = req.body;
 
   try {
-    if (!adage || !country)
-      throw createErr.BadRequest("provide required fields");
+    if (!patchObject) throw createErr.BadRequest("patch object is invalid");
 
     if (!req.payload.aud) throw createErr.Forbidden();
-
-    const similarAdage = await Adage.findOne({ adage });
-
-    if (similarAdage)
-      throw createErr.Conflict({
-        message: "similar adage already exist",
-        adage,
-      });
     //   Find owner.
     const foundOwner = Contributor.findById(req.payload.aud);
     if (!foundOwner) throw createErr.NotFound("account not found");
 
-    const newAdage = new Adage({
-      adage,
-      country,
-      //   tags: tags !== [] ? tags.forEach((tag) => tags.push(tag)) : tags,
-      owner: req.payload.aud,
+    await patchObject.forEach((doc) => {
+      try {
+        const newAdage = new Adage({
+          adage: doc.adage,
+          uniqueTo: doc.uniqueTo,
+          interpretation: doc.interpretation,
+          owner: req.payload.aud,
+          translations: '',
+          tags: '',
+        });
+
+        await newAdage.save();
+      } catch (err) {
+        next(err);
+      }
     });
+
     const addedAdage = await newAdage.save();
 
     res.send({
@@ -112,7 +114,7 @@ const patchAdage = async (req, res, next) => {
       { adage, country }
     );
     if (!updatedAdage) throw createErr.InternalServerError();
-    res.send("updated");
+    res.send("adage updated");
   } catch (err) {
     next(err);
   }
@@ -136,7 +138,7 @@ const deleteAdage = async (req, res, next) => {
 
     const deletedAdage = await Adage.findOneAndDelete({ _id: id, owner: aud });
     if (!deletedAdage) throw createErr.InternalServerError();
-    res.send("deleted");
+    res.send("adage deleted");
   } catch (err) {
     next(err);
   }
@@ -152,26 +154,20 @@ const patchProfile = async (req, res, next) => {
     if (!req.payload.aud) throw createErr.Forbidden();
 
     if (!name || !email || !country)
-      throw createErr.BadGateway("provide fields to update");
+      throw createErr.BadRequest("provide fields to update");
 
     if (email) {
       const isEmail = validate_email(email);
-      if (!isEmail) throw createErr.BadRequest("verify your email");
+      if (!isEmail) throw createErr.BadRequest("invalid email");
     }
-
-    const data = {
-      name,
-      email: email && email,
-      country,
-    };
 
     const updatedProfile = await Contributor.findByIdAndUpdate(
       { _id: req.payload.aud },
-      { ...data }
+      {  name, email: email, country }
     );
 
     if (!updatedProfile) throw createErr.NotFound("profile not found");
-    res.send("updated");
+    res.send("profile updated");
   } catch (err) {
     next(err);
   }
