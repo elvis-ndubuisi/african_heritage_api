@@ -11,6 +11,7 @@ const genRandomAdage = require("./helpers/gen_randomAdage");
 const helmet = require("helmet");
 const initMongo = require("./helpers/init_mongoDb");
 const jobs = require("./helpers/jobs");
+const limiter = require("./middleware/rateLimiter.middleware");
 const redisClient = require("./helpers/redis_client");
 const morgan = require("morgan");
 require("dotenv").config();
@@ -23,6 +24,7 @@ jobs.cacheAdageOfTheDay(genRandomAdage);
 jobs.postAdageOnTwitter();
 
 // Dependencies
+app.set("trust-proxy", 1);
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(express.json());
@@ -32,7 +34,7 @@ app.use(cookieParser());
 // Routes.
 app.use("/account", cors(corsConfig.contributorCORS), authRoute);
 app.use("/cnt/profile", cors(corsConfig.contributorCORS), contRoute);
-app.use("/", cors(corsConfig.apiCORS), adageRoute);
+app.use("/", cors(corsConfig.apiCORS), limiter, adageRoute);
 
 app.get("/", (req, res) => {
   res.status(200).json({
