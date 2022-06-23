@@ -38,15 +38,13 @@ const registerContributor = async (req, res, next) => {
 
     const resp = await contributor.save();
     const accessToken = await signAccessToken(resp.id);
-    const refreshToken = await signRefreshToken(resp.id);
+    const refreshToken = await signRefreshToken(resp.id, resp.name, resp.email);
 
     res.send({
       accessToken,
       refreshToken,
-      name: resp.name,
       country: resp.country,
       gender: resp.gender,
-      email: resp.email,
     });
   } catch (err) {
     next(err);
@@ -72,14 +70,16 @@ const loginContributor = async (req, res, next) => {
     const isMatch = await foundContributor.isValidPassword(password);
     if (!isMatch) throw createErr.Unauthorized("invalid email/password");
 
-    const accessToken = await signAccessToken(foundContributor.id);
+    const accessToken = await signAccessToken(
+      foundContributor.id,
+      foundContributor.name,
+      foundContributor.email
+    );
     const refreshToken = await signRefreshToken(foundContributor.id);
 
     res.send({
       accessToken,
       refreshToken,
-      name: foundContributor.name,
-      email: foundContributor.email,
       country: foundContributor.country,
       gender: foundContributor.gender,
     });

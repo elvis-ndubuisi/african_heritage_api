@@ -91,7 +91,7 @@ const postBatchAdage = async (req, res, next) => {
 //@route    PATCH /cnt/profile/adage?:id
 // @access  protected
 const patchAdage = async (req, res, next) => {
-  const { adage, tags } = req.body;
+  const { adage, country, tags } = req.body;
   const { aud } = req.payload;
   const { id } = req.query;
 
@@ -107,14 +107,12 @@ const patchAdage = async (req, res, next) => {
     // verify claim.
     if (foundAdage.owner.toString() !== aud) throw createErr.Forbidden();
 
-    const updatedAdage = await Adage.updateOne({ id, owner: aud }, { adage });
+    const updatedAdage = await Adage.findOneAndUpdate(
+      { _id: id, owner: aud },
+      { adage, country }
+    );
     if (!updatedAdage) throw createErr.InternalServerError();
-    res.send({
-      adage: updatedAdage.adage,
-      country: updatedAdage.country,
-      tags: updatedAdage.tags,
-      id: updatedAdage.id,
-    });
+    res.send("updated");
   } catch (err) {
     next(err);
   }
@@ -131,12 +129,12 @@ const deleteAdage = async (req, res, next) => {
     if (!id) throw createErr.BadRequest("provide adage id");
     if (!aud) throw createErr.Forbidden();
 
-    const foundAdage = await Adage.findOne({ id });
+    const foundAdage = await Adage.findOne({ _id: id });
 
     if (!foundAdage) throw createErr.NotFound("adage not found");
     if (foundAdage.owner.toString() !== aud) throw createErr.Forbidden();
 
-    const deletedAdage = await Adage.deleteOne({ id, owner: aud });
+    const deletedAdage = await Adage.findOneAndDelete({ _id: id, owner: aud });
     if (!deletedAdage) throw createErr.InternalServerError();
     res.send("deleted");
   } catch (err) {
@@ -188,7 +186,7 @@ const getContributorAdages = async (req, res, next) => {
 
     // Set default pagination params.
     if (!page) page = 1;
-    if (!size) size = 3;
+    if (!size) size = 8;
 
     const limit = parseInt(size);
     const skip = (page - 1) * size;
