@@ -4,17 +4,18 @@ const redisClient = require("../helpers/redis_client");
 require("dotenv").config();
 
 module.exports = {
-  signAccessToken: (userId) => {
+  signAccessToken: (userId, userName, userEmail) => {
     return new Promise((resolve, reject) => {
       const payload = {
-        name: "payload",
+        name: String(userName),
+        sub: String(userEmail),
       };
 
       const secret = process.env.ACCESS_TOKEN;
 
       const options = {
         expiresIn: "16m",
-        issuer: "africa adage",
+        issuer: "African Heritage",
         audience: userId,
       };
       jwt.sign(payload, secret, options, (err, token) => {
@@ -55,7 +56,7 @@ module.exports = {
 
       const options = {
         expiresIn: "24h",
-        issuer: "africa.com",
+        issuer: "African Heritage",
         audience: userId,
       };
       jwt.sign(payload, secret, options, async (err, token) => {

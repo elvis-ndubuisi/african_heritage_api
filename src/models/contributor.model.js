@@ -28,11 +28,6 @@ const contributorSchema = new Schema(
       required: true,
       trim: true,
     },
-    gender: {
-      type: String,
-      required: true,
-      trim: true,
-    },
   },
   { timestamps: true }
 );
