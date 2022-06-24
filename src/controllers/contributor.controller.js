@@ -59,15 +59,15 @@ const postBatchAdage = async (req, res, next) => {
     const foundOwner = Contributor.findById(req.payload.aud);
     if (!foundOwner) throw createErr.NotFound("account not found");
 
-    await patchObject.forEach((doc) => {
+    await patchObject.forEach(async (doc) => {
       try {
         const newAdage = new Adage({
           adage: doc.adage,
           uniqueTo: doc.uniqueTo,
           interpretation: doc.interpretation,
           owner: req.payload.aud,
-          translations: '',
-          tags: '',
+          translations: "",
+          tags: "",
         });
 
         await newAdage.save();
@@ -163,7 +163,7 @@ const patchProfile = async (req, res, next) => {
 
     const updatedProfile = await Contributor.findByIdAndUpdate(
       { _id: req.payload.aud },
-      {  name, email: email, country }
+      { name, email: email, country }
     );
 
     if (!updatedProfile) throw createErr.NotFound("profile not found");
