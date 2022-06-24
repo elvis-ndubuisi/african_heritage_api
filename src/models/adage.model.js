@@ -26,6 +26,7 @@ const adageSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+    country: { type: String, trim: true, lowercase: true },
     owner: {
       type: Schema.Types.ObjectId,
       required: true,

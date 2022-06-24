@@ -32,10 +32,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routes.
-app.use("/account", cors(corsConfig.contributorCORS), authRoute);
-app.use("/cnt/profile", cors(corsConfig.contributorCORS), contRoute);
-app.use("/", cors(corsConfig.apiCORS), limiter, adageRoute);
-
 app.get("/", (req, res) => {
   res.status(200).json({
     name: "African Heritage API",
@@ -43,6 +39,13 @@ app.get("/", (req, res) => {
     twitter: "https://twitter.com/_ndubuisi_elvis",
   });
 });
+
+// app.use("/account", cors(corsConfig.contributorCORS), authRoute);
+// app.use("/cnt/profile", cors(corsConfig.contributorCORS), contRoute);
+// app.use("/", cors(corsConfig.apiCORS), limiter, adageRoute);
+app.use("/account", authRoute);
+app.use("/cnt/profile", contRoute);
+app.use("/", adageRoute);
 
 app.use("*", (req, res, next) => {
   next(createErr.NotFound("This route doesn't exist"));
