@@ -1,3 +1,5 @@
+const cors = require("cors");
+const corsConfig = require("../config/cors.config");
 const router = require("express").Router();
 const {
   addAdage,
@@ -8,6 +10,7 @@ const {
 } = require("../controllers/contributor.controller");
 const { verifyAccessToken } = require("../helpers/jwt_auth");
 
+router.use(cors(corsConfig.contributorCORS));
 router.use(verifyAccessToken);
 router.patch("/", editProfile);
 router.get("/adages", getAdages);
