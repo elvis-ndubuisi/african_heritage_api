@@ -2306,6 +2306,44 @@ const dummy = [
     tags: [],
     uniqueTo: "Baluba",
   },
+  {
+    adage:
+      "he that beats the drum for the mad man to dance is no better than the mad man himself",
+    translations: {},
+    interpretation: "",
+    tags: [],
+    uniqueTo: "african",
+  },
+  {
+    adage:
+      "a bird that flies off the earth and lands on an anthill is still on the ground",
+    translations: {},
+    interpretation: "",
+    tags: [],
+    uniqueTo: "igbo",
+  },
+  {
+    adage: "where water is the boss, there the land must obey",
+    translations: {},
+    interpretation: "",
+    tags: [],
+    uniqueTo: "african",
+  },
+  {
+    adage:
+      "no matter how beautiful and well-crafted a coffin might look, it will not make anyone wish for death",
+    translations: {},
+    interpretation: "",
+    tags: [],
+    uniqueTo: "african",
+  },
+  {
+    adage: "when the shepherd comes home in peace, the milk is sweet",
+    translations: {},
+    interpretation: "",
+    tags: [],
+    uniqueTo: "ethiopian",
+  },
 ];
 
 module.exports = dummy;
