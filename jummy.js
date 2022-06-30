@@ -2061,7 +2061,7 @@ const dummy = [
       kiswahili: "Usiuume mkono unaokulisha",
       french: "Ne piques pas la main qui te sert a manger",
     },
-    interpretation:
+    interpretation:Develop
       "it teaches the importance of appreciating any good deeds done to us by others. We should respect, honour and protect those who support us in our lives because when they are not able we shall surely suffer",
     tags: [],
     uniqueTo: "kenyan",
