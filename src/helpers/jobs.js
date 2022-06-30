@@ -1,10 +1,9 @@
 const cron = require("node-cron");
 const redisClient = require("./redis_client");
-const { TwitterApi } = require("twitter-api-v2");
-
-const ElvisNdubuisiClient = new TwitterApi(
-  process.env.AFRICAN_HERITAGE_B_TOKEN
-);
+const TweetSubscriber = require("../models/tweet.model");
+const fetch = require("node-fetch");
+const { ListSubscribersV1Paginator } = require("twitter-api-v2");
+const { subscribe } = require("../routes/tweet.router");
 
 module.exports = {
   postAdageOnTwitter: () => {
@@ -14,6 +13,28 @@ module.exports = {
       await ElvisNdubuisiClient.v2.tweet({
         text: adage,
       });
+    });
+  },
+  postAdageOnTwitterTest: () => {
+    //   Posts adage of the day on twitter every day by 8:00am.
+    cron.schedule("2 * * * * *", async () => {
+      // try {
+      // } catch (err) {
+      //   console.log(err);
+      // }
+      // await subscribers.forEach(async (subscriber) => {
+      //   if (processed.includes(subscriber.subscriberId)) {
+      //     return;
+      //   }
+      //   // tweet
+      //   const response = await fetch("http://localhost:5000/tweet/autopost", {
+      //     method: "POST",
+      //     body: JSON.stringify({ refresh: subscriber.refresh }),
+      //     headers: { "Content-Type": "application/json" },
+      //   });
+      //   await processed.push(subscriber.subscriberId);
+      //   console.log(await response.json());
+      // });
     });
   },
   cacheAdageOfTheDay: (fn) => {

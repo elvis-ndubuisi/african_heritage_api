@@ -2,6 +2,7 @@ const createErr = require("http-errors");
 const Contributor = require("../models/contributor.model");
 const Adage = require("../models/adage.model");
 const validate_email = require("../helpers/validate_email");
+const dummy = require("../../jummy");
 
 // @desc    Add adage
 // @route   POST /cnt/profile/adage
@@ -49,25 +50,25 @@ const postAdage = async (req, res, next) => {
 // @route   POST /cnt/profile/adage/batch
 // @access  protected
 const postBatchAdage = async (req, res, next) => {
-  const { patchObject } = req.body;
+  // const { patchObject } = req.body;
 
   try {
-    if (!patchObject) throw createErr.BadRequest("patch object is invalid");
+    // if (!patchObject) throw createErr.BadRequest("patch object is invalid");
 
     if (!req.payload.aud) throw createErr.Forbidden();
     //   Find owner.
     const foundOwner = Contributor.findById(req.payload.aud);
     if (!foundOwner) throw createErr.NotFound("account not found");
 
-    await patchObject.forEach(async (doc) => {
+    await dummy.forEach(async (doc) => {
       try {
         const newAdage = new Adage({
           adage: doc.adage,
           uniqueTo: doc.uniqueTo,
           interpretation: doc.interpretation,
           owner: req.payload.aud,
-          translations: "",
-          tags: "",
+          translations: doc.translations,
+          tags: doc.tags,
         });
 
         await newAdage.save();
@@ -76,14 +77,7 @@ const postBatchAdage = async (req, res, next) => {
       }
     });
 
-    const addedAdage = await newAdage.save();
-
-    res.send({
-      adage: addedAdage.adage,
-      country: addedAdage.country,
-      id: addedAdage.id,
-      tags: addedAdage.tags,
-    });
+    res.send("okay");
   } catch (err) {
     next(err);
   }
@@ -224,4 +218,5 @@ module.exports = {
   editAdage: patchAdage,
   deleteAdage,
   editProfile: patchProfile,
+  postBatchAdage,
 };

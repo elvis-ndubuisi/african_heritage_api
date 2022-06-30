@@ -3,17 +3,15 @@ const authRoute = require("./routes/auth.route");
 const colors = require("colors");
 const cookieParser = require("cookie-parser");
 const contRoute = require("./routes/contributor.route");
-const cors = require("cors");
-const corsConfig = require("./config/cors.config");
 const createErr = require("http-errors");
 const express = require("express");
 const genRandomAdage = require("./helpers/gen_randomAdage");
 const helmet = require("helmet");
 const initMongo = require("./helpers/init_mongoDb");
 const jobs = require("./helpers/jobs");
-const limiter = require("./middleware/rateLimiter.middleware");
-const redisClient = require("./helpers/redis_client");
 const morgan = require("morgan");
+const redisClient = require("./helpers/redis_client");
+// const tweetRouter = require("./routes/tweet.router");
 require("dotenv").config();
 
 const app = express();
@@ -21,10 +19,9 @@ const PORT = process.env.port || 5000;
 
 // Jobs
 jobs.cacheAdageOfTheDay(genRandomAdage);
-jobs.postAdageOnTwitter();
 
 // Dependencies
-app.set("trust-proxy", 1);
+// app.set("trust-proxy", 1);
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(express.json());
@@ -45,6 +42,7 @@ app.get("/", (req, res) => {
 // app.use("/", cors(corsConfig.apiCORS), limiter, adageRoute);
 app.use("/account", authRoute);
 app.use("/cnt/profile", contRoute);
+// app.use("/tweet", tweetRouter);
 app.use("/", adageRoute);
 
 app.use("*", (req, res, next) => {

@@ -9,9 +9,11 @@ const getRandAdage = async (req, res, next) => {
   try {
     const value = await genRandomAdage();
     res.json({
-      adage: value.adage.adage,
-      country: value.adage.country,
       id: value.seed,
+      adage: value.adage.adage,
+      uniqueTo: value.adage.uniqueTo,
+      translations: value.adage.translations,
+      interpretation: value.adage.interpretation,
     });
   } catch (err) {
     next(err);
