@@ -14,6 +14,4 @@ const apiCORS = {
 module.exports = {
   contributorCORS,
   apiCORS,
-  allowOrigins,
-  corsOptionsDelegate,
 };
