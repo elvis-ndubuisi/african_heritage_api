@@ -20,7 +20,7 @@ const corsOptionsDelegate = (req, fn) => {
 };
 
 const apiCORS = {
-  origin: true,
+  origin: "*",
   methods: "GET",
   optionsSuccessStatus: 204,
 };

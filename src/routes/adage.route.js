@@ -9,7 +9,7 @@ const {
 } = require("../controllers/adage.controller.js");
 
 router.use(cors(corsConfig.apiCORS));
-router.use(limiter);
+// router.use(limiter);
 router.get("/adage", getAdage);
 router.get("/adage/aod", adageOfTheDay);
 router.get("/adage/query", queryAdage);
