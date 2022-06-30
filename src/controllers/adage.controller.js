@@ -11,9 +11,9 @@ const getRandAdage = async (req, res, next) => {
     res.json({
       id: value.seed,
       adage: value.adage.adage,
-      country: value.adage.country,
-      translations: value.translation,
-      interpretation: value.interpretation,
+      uniqueTo: value.adage.uniqueTo,
+      translations: value.adage.translations,
+      interpretation: value.adage.interpretation,
     });
   } catch (err) {
     next(err);
