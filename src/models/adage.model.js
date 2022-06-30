@@ -14,6 +14,8 @@ const adageSchema = new Schema(
     translations: {
       type: Map,
       of: String,
+      trim: true,
+      lowercase: true,
     },
     interpretation: {
       type: String,

@@ -15,7 +15,7 @@ const init_mongoDb = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      dbName: "africanAdage",
+      dbName: "AfricanHeritage",
     });
     console.log("\tReady:".yellow.bold + "\tDatabase");
     // console.log(`\tMongo Connected => ${conn.connection.host}`.cyan.underline);
