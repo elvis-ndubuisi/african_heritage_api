@@ -63,6 +63,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, async () => {
   console.log("****************************************".green);
   await redisClient.connect();
+  redisClient.auth(process.env.REDIS_PASSWORD);
   await initMongo();
   console.log(colors.cyan.underline.bold(`\tserver ready`));
   console.log("****************************************".green);
