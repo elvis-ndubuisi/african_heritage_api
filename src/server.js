@@ -11,7 +11,6 @@ const initMongo = require("./helpers/init_mongoDb");
 const jobs = require("./helpers/jobs");
 const morgan = require("morgan");
 const redisClient = require("./helpers/redis_client");
-// const tweetRouter = require("./routes/tweet.router");
 require("dotenv").config();
 
 const app = express();
@@ -42,7 +41,6 @@ app.get("/", (req, res) => {
 // app.use("/", cors(corsConfig.apiCORS), limiter, adageRoute);
 app.use("/account", authRoute);
 app.use("/cnt/profile", contRoute);
-// app.use("/tweet", tweetRouter);
 app.use("/", adageRoute);
 
 app.use("*", (req, res, next) => {
@@ -63,7 +61,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, async () => {
   console.log("****************************************".green);
   await redisClient.connect();
-  redisClient.auth(process.env.REDIS_PASSWORD);
   await initMongo();
   console.log(colors.cyan.underline.bold(`\tserver ready`));
   console.log("****************************************".green);
