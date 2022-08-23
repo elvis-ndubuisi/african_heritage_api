@@ -3,7 +3,10 @@ const colors = require("colors");
 require("dotenv").config();
 
 const redisClient = redis.createClient({
-  url: process.env.REDIS_URL,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
   password: process.env.REDIS_PASSWORD,
 });
 

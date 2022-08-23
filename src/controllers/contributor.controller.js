@@ -2,7 +2,6 @@ const createErr = require("http-errors");
 const Contributor = require("../models/contributor.model");
 const Adage = require("../models/adage.model");
 const validate_email = require("../helpers/validate_email");
-const dummy = require("../../jummy");
 
 // @desc    Add adage
 // @route   POST /cnt/profile/adage
