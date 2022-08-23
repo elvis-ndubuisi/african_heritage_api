@@ -14,7 +14,7 @@ const redisClient = require("./helpers/redis_client");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.port || 5000;
+const PORT = process.env.PORT || 5000;
 
 // Jobs
 jobs.cacheAdageOfTheDay(genRandomAdage);
@@ -33,6 +33,7 @@ app.get("/", (req, res) => {
     name: "African Heritage API",
     owner: "Elvis Ndubuisi Victor",
     twitter: "https://twitter.com/_ndubuisi_elvis",
+    portfolio: "elvis.js.cool",
   });
 });
 
